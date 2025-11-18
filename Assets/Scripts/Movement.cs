@@ -14,7 +14,7 @@ public class Movement : MonoBehaviour
     private Vector3 velocity;
     private float xRotation = 0f;
 
-    public Transform playerCamera; // Referencia a la cámara
+    public Transform playerCamera;
 
     void Start()
     {
@@ -24,7 +24,7 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        // ==== ROTACIÓN ====
+        // OTACIÓN
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
@@ -43,7 +43,7 @@ public class Movement : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * speed * Time.deltaTime);
 
-        // ==== GRAVEDAD + SALTO ====
+        // RAVEDAD + SALTO
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
