@@ -58,6 +58,15 @@ public class LockInteraction : MonoBehaviour
                 currentProgress = totalTime;
                 StopInteraction();
                 Debug.Log("Cerradura completada.");
+
+                if (progressBar != null)
+                    progressBar.gameObject.SetActive(false);
+
+                if (progressPanel != null)
+                    progressPanel.SetActive(false);
+
+                Destroy(gameObject);
+                //Aquí irá la logica de abrir la puerta
             }
         }
     }
