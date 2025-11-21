@@ -8,7 +8,7 @@ public class Movement : MonoBehaviour
     public float jumpHeight = 1.5f;
 
     [Header("Ratón")]
-    public float mouseSensitivity = 200f;
+    public float mouseSensitivity = 800f;
 
     private CharacterController controller;
     private Vector3 velocity;
