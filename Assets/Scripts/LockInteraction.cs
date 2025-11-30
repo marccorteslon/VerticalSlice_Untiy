@@ -9,11 +9,15 @@ public class LockInteraction : MonoBehaviour
 
     [Header("UI")]
     public Slider progressBar;
-    public GameObject progressPanel;       
+    public GameObject progressPanel;
 
     private float currentProgress = 0f;
     private bool isPlayerNear = false;
     private bool isInteracting = false;
+
+    // NUEVO: frecuencia de sonido
+    public float noiseInterval = 0.5f;
+    private float noiseTimer = 0f;
 
     void Start()
     {
@@ -53,11 +57,12 @@ public class LockInteraction : MonoBehaviour
             if (progressBar != null)
                 progressBar.value = currentProgress;
 
+            EmitNoiseWhileLockpicking();   // NUEVO
+
             if (currentProgress >= totalTime)
             {
                 currentProgress = totalTime;
                 StopInteraction();
-                Debug.Log("Cerradura completada.");
 
                 if (progressBar != null)
                     progressBar.gameObject.SetActive(false);
@@ -65,8 +70,26 @@ public class LockInteraction : MonoBehaviour
                 if (progressPanel != null)
                     progressPanel.SetActive(false);
 
+                Debug.Log("Cerradura completada.");
+
                 Destroy(gameObject);
-                //Aquí irá la logica de abrir la puerta
+            }
+        }
+    }
+
+    private void EmitNoiseWhileLockpicking()
+    {
+        noiseTimer += Time.deltaTime;
+
+        if (noiseTimer >= noiseInterval)
+        {
+            noiseTimer = 0f;
+
+            EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
+
+            foreach (EnemyAI enemy in enemies)
+            {
+                enemy.HearNoise(transform, NoiseLevel.High);
             }
         }
     }

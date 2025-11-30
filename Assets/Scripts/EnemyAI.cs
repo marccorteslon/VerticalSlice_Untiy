@@ -7,18 +7,19 @@ public class EnemyAI : MonoBehaviour
     private NavMeshAgent agent;
 
     [Header("Chase Settings")]
-    public float chaseSpeed = 20f; // Velocidad al perseguir al jugador
+    public float chaseSpeed = 20f;
+    public float loseSightTime = 3f;    // Tiempo que tarda en olvidarte
+    private float timeSinceLastSeen = Mathf.Infinity;
 
     [Header("Vision Settings")]
-    public float visionDistance = 15f; // Distancia máxima que puede ver
+    public float visionDistance = 15f;
     [Range(0, 360)]
-    public float visionAngle = 90f;    // Ángulo del campo de visión
+    public float visionAngle = 90f;
 
     [Header("Patrol Settings")]
     public float patrolRadius = 15f;
     public float patrolWaitTime = 3f;
     private float patrolSpeed;
-
     private Vector3 patrolTarget;
     private float patrolTimer;
 
@@ -34,6 +35,8 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.angularSpeed = 720f; // ROTACIÓN MUCHO MÁS RÁPIDA
+
         if (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -46,12 +49,11 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        // Si hay ruido
+        // Si está siguiendo ruido, priorízalo
         if (noiseTarget != null)
         {
             agent.speed = Random.Range(minNoiseSpeed, maxNoiseSpeed);
             agent.SetDestination(noiseTarget.position);
-            Debug.Log($"Enemigo va hacia ruido en {noiseTarget.name} a velocidad {agent.speed}");
 
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
@@ -61,21 +63,39 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        // Comprobamos visión del jugador
-        if (CanSeePlayer())
+        bool seesPlayer = CanSeePlayer();
+
+        // Actualizar temporizador de memoria
+        if (seesPlayer)
         {
-            agent.speed = chaseSpeed;
-            agent.SetDestination(player.position);
+            timeSinceLastSeen = 0f;
         }
         else
         {
-            agent.speed = patrolSpeed;
+            timeSinceLastSeen += Time.deltaTime;
+        }
+
+        // Si lo veo o lo he visto hace poco tiempo, sigo persiguiendo
+        if (timeSinceLastSeen < loseSightTime)
+        {
+            ChasePlayer();
+        }
+        else
+        {
             Patrol();
         }
     }
 
+    void ChasePlayer()
+    {
+        agent.speed = chaseSpeed;
+        agent.SetDestination(player.position);
+    }
+
     void Patrol()
     {
+        agent.speed = patrolSpeed;
+
         if (agent.remainingDistance <= agent.stoppingDistance)
         {
             patrolTimer += Time.deltaTime;
@@ -99,25 +119,52 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Método que comprueba si el jugador está dentro del campo de visión
     bool CanSeePlayer()
     {
-        Vector3 directionToPlayer = player.position - transform.position;
-        float distance = directionToPlayer.magnitude;
-
-        if (distance > visionDistance) return false; // Fuera del rango
-
-        float angle = Vector3.Angle(transform.forward, directionToPlayer);
-        if (angle > visionAngle / 2f) return false; // Fuera del ángulo
-
-        // Opcional: raycast para evitar ver a través de paredes
-        if (Physics.Raycast(transform.position + Vector3.up * 1.5f, directionToPlayer.normalized, out RaycastHit hit, visionDistance))
+        if (player == null)
         {
-            if (hit.transform != player) return false; // Obstáculo entre enemigo y jugador
+            Debug.LogError("EnemyAI: Player es NULL. No tiene el tag 'Player' o no existe en escena.");
+            return false;
         }
 
+        Vector3 eyePos = transform.position + Vector3.up * 1.7f;
+        Vector3 playerCenter = player.position + Vector3.up * 1f;
+        Vector3 dir = playerCenter - eyePos;
+
+        float distance = dir.magnitude;
+
+        if (distance > visionDistance)
+        {
+            Debug.Log("NO VE: fuera de distancia");
+            return false;
+        }
+
+        float angle = Vector3.Angle(transform.forward, dir);
+        if (angle > visionAngle / 2f)
+        {
+            Debug.Log("NO VE: fuera del ángulo de visión");
+            return false;
+        }
+
+        if (Physics.Raycast(eyePos, dir.normalized, out RaycastHit hit, visionDistance))
+        {
+            if (hit.transform != player)
+            {
+                Debug.Log("NO VE: el raycast golpea primero a " + hit.transform.name);
+                return false;
+            }
+        }
+        else
+        {
+            Debug.Log("NO VE: el Raycast NO golpea nada");
+            return false;
+        }
+
+        Debug.Log("SI VE al jugador");
         return true;
     }
+
+
 
     public void HearNoise(Transform noiseObject, NoiseLevel level)
     {
@@ -140,7 +187,6 @@ public class EnemyAI : MonoBehaviour
         if (canHear)
         {
             noiseTarget = noiseObject;
-            Debug.Log($"Enemigo escuchó ruido {level} de {noiseObject.name}");
         }
     }
 }

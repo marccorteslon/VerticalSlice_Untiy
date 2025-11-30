@@ -8,7 +8,7 @@ public class MonsterScript : MonoBehaviour
     [Header("Objetos del mapa")]
     public InteractableObject[] objects;
 
-[Header("UI Debug")]
+    [Header("UI Debug")]
     public TMP_Text activeObjectText;
     public TMP_Text timerText;
     public TMP_Text monsterText;
@@ -47,11 +47,25 @@ public class MonsterScript : MonoBehaviour
             countdown = timeToClose;
             waitingForPlayer = true;
 
+            // Obtener el AudioSource de la entrada
+            AudioSource entranceAudio = currentActive.GetComponent<AudioSource>();
+            if (entranceAudio != null)
+            {
+                entranceAudio.loop = true;
+                entranceAudio.Play();
+            }
+
             while (waitingForPlayer && countdown > 0f)
             {
                 countdown -= Time.deltaTime;
                 timerText.text = "Time: " + countdown.ToString("F1");
                 yield return null;
+            }
+
+            // Detener el sonido de la entrada
+            if (entranceAudio != null)
+            {
+                entranceAudio.Stop();
             }
 
             timerText.text = "";
@@ -80,7 +94,5 @@ public class MonsterScript : MonoBehaviour
     {
         waitingForPlayer = false;
         activeObjectText.text = "Entrance closed: " + currentActive.name;
-    }  
-
-
+    }
 }
