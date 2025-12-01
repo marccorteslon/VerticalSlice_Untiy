@@ -135,14 +135,14 @@ public class EnemyAI : MonoBehaviour
 
         if (distance > visionDistance)
         {
-            Debug.Log("NO VE: fuera de distancia");
+            //Debug.Log("NO VE: fuera de distancia");
             return false;
         }
 
         float angle = Vector3.Angle(transform.forward, dir);
         if (angle > visionAngle / 2f)
         {
-            Debug.Log("NO VE: fuera del ángulo de visión");
+            //Debug.Log("NO VE: fuera del ángulo de visión");
             return false;
         }
 
