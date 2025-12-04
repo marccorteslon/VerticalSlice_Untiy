@@ -18,8 +18,6 @@ public class NoiseMaker : MonoBehaviour
         }
 
         Debug.Log($"{gameObject.name} hizo un ruido {noiseLevel}");
-        // Opcional: podrías desactivar el ruido después de unos segundos
-        // StartCoroutine(DisableNoise());
     }
 
     // Ejemplo de uso con colisiones o acción

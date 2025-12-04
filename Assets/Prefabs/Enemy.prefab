@@ -273,7 +273,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!1 &1530331272283287793
 GameObject:
@@ -457,6 +457,10 @@ MonoBehaviour:
   loseSightTime: 3
   visionDistance: 15
   visionAngle: 90
+  eyeHeight: 1.7
+  visionBlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   patrolRadius: 100
   patrolWaitTime: 1
   hearingRangeLow: 15
@@ -464,3 +468,4 @@ MonoBehaviour:
   hearingRangeHigh: 100
   minNoiseSpeed: 15
   maxNoiseSpeed: 25
+  manualTurnSpeed: 720

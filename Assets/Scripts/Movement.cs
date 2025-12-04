@@ -10,6 +10,9 @@ public class Movement : MonoBehaviour
     [Header("Ratón")]
     public float mouseSensitivity = 800f;
 
+    [Header("Estado")]
+    public bool isHidden = false; // Si true, el jugador no se puede mover
+
     private CharacterController controller;
     private Vector3 velocity;
     private float xRotation = 0f;
@@ -24,7 +27,9 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        // OTACIÓN
+        if (isHidden) return; // Si está escondido, no hacer nada
+
+        // ROTACIÓN
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
@@ -43,7 +48,7 @@ public class Movement : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * speed * Time.deltaTime);
 
-        // RAVEDAD + SALTO
+        // GRAVEDAD + SALTO
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
