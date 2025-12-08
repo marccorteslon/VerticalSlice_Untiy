@@ -14,7 +14,7 @@ public class MonsterScript : MonoBehaviour
     public TMP_Text monsterText;
 
     [Header("Prefab a spawnear")]
-    public GameObject spawnPrefab;  // Prefab que aparecerá cuando el monstruo entre  
+    public GameObject spawnPrefab;
 
     private InteractableObject currentActive;
     private bool waitingForPlayer = false;
@@ -47,13 +47,8 @@ public class MonsterScript : MonoBehaviour
             countdown = timeToClose;
             waitingForPlayer = true;
 
-            // Obtener el AudioSource de la entrada
-            AudioSource entranceAudio = currentActive.GetComponent<AudioSource>();
-            if (entranceAudio != null)
-            {
-                entranceAudio.loop = true;
-                entranceAudio.Play();
-            }
+            // REPRODUCIR AUDIO EN BUCLE
+            currentActive.PlayAudioLoop();
 
             while (waitingForPlayer && countdown > 0f)
             {
@@ -62,16 +57,14 @@ public class MonsterScript : MonoBehaviour
                 yield return null;
             }
 
-            // Detener el sonido de la entrada
-            if (entranceAudio != null)
-            {
-                entranceAudio.Stop();
-            }
-
             timerText.text = "";
+
+            // PARAR AUDIO SI SIGUE ACTIVO
+            currentActive.StopAudio();
 
             if (waitingForPlayer)
             {
+                // EL MONSTRUO ENTRA
                 monsterEntered = true;
                 currentActive.Deactivate();
 
@@ -79,13 +72,10 @@ public class MonsterScript : MonoBehaviour
                 activeObjectText.text = "";
                 timerText.text = "";
 
-                // Spawnear el objeto en la posición del currentActive
                 if (spawnPrefab != null)
                 {
                     Instantiate(spawnPrefab, currentActive.transform.position, Quaternion.identity);
                 }
-
-                yield break;
             }
         }
     }
@@ -94,5 +84,8 @@ public class MonsterScript : MonoBehaviour
     {
         waitingForPlayer = false;
         activeObjectText.text = "Entrance closed: " + currentActive.name;
+
+        // PARAR AUDIO SI CIERRAS LA ENTRADA
+        currentActive.StopAudio();
     }
 }
