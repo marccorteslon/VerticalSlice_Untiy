@@ -13,13 +13,13 @@ public class LockpickItem : MonoBehaviour
             if (lockInteraction != null)
             {
                 lockInteraction.canInteract = true;
-                Debug.Log("DEBUG: Lockpick picked up");
+                Debug.Log("Lockpick picked up");
             }
 
             // Cambiar el texto de la UI si está asignado
             if (keyStatusText != null)
             {
-                keyStatusText.text = "DEBUG: Lockpick picked up";
+                keyStatusText.text = "Lockpick picked up";
             }
 
             Destroy(gameObject);

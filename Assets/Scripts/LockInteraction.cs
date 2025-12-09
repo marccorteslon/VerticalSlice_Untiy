@@ -11,11 +11,14 @@ public class LockInteraction : MonoBehaviour
     public Slider progressBar;
     public GameObject progressPanel;
 
+    [Header("Victoria")]          // NUEVO
+    public GameObject victoryPanel;  // Panel que aparecerá cuando completes el candado
+
     private float currentProgress = 0f;
     private bool isPlayerNear = false;
     private bool isInteracting = false;
 
-    // NUEVO: frecuencia de sonido
+    // Frecuencia de sonido
     public float noiseInterval = 0.5f;
     private float noiseTimer = 0f;
 
@@ -30,6 +33,10 @@ public class LockInteraction : MonoBehaviour
 
         if (progressPanel != null)
             progressPanel.SetActive(false);
+
+        // NUEVO: ocultar panel de victoria al inicio
+        if (victoryPanel != null)
+            victoryPanel.SetActive(false);
     }
 
     void Update()
@@ -57,7 +64,7 @@ public class LockInteraction : MonoBehaviour
             if (progressBar != null)
                 progressBar.value = currentProgress;
 
-            EmitNoiseWhileLockpicking();   // NUEVO
+            EmitNoiseWhileLockpicking();
 
             if (currentProgress >= totalTime)
             {
@@ -71,6 +78,8 @@ public class LockInteraction : MonoBehaviour
                     progressPanel.SetActive(false);
 
                 Debug.Log("Cerradura completada.");
+
+                ShowVictoryPanel();   // NUEVO
 
                 Destroy(gameObject);
             }
@@ -111,9 +120,7 @@ public class LockInteraction : MonoBehaviour
     private void StopInteraction()
     {
         if (isInteracting)
-        {
             isInteracting = false;
-        }
 
         if (!isPlayerNear)
         {
@@ -123,6 +130,15 @@ public class LockInteraction : MonoBehaviour
             if (progressPanel != null)
                 progressPanel.SetActive(false);
         }
+    }
+
+    private void ShowVictoryPanel()        
+    {
+        if (victoryPanel != null)
+            victoryPanel.SetActive(true);
+
+        
+        Time.timeScale = 0f;
     }
 
     private void OnTriggerEnter(Collider other)
