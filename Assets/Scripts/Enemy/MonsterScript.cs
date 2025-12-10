@@ -88,4 +88,11 @@ public class MonsterScript : MonoBehaviour
         // PARAR AUDIO SI CIERRAS LA ENTRADA
         currentActive.StopAudio();
     }
+
+    IEnumerator ClearMonsterTextAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        monsterText.text = "";
+    }
+
 }
