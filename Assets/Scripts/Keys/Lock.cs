@@ -3,7 +3,7 @@ using UnityEngine;
 public class Lock : MonoBehaviour
 {
     [Header("Configuración del candado")]
-    public string requiredKeyID;   // Qué llave abre este candado
+    public string requiredKeyID;
     public bool isOpen = false;
 
     [Header("Opcional: animación o puerta")]
@@ -26,9 +26,10 @@ public class Lock : MonoBehaviour
     private void Unlock()
     {
         isOpen = true;
+
         Debug.Log("Candado abierto: " + requiredKeyID);
 
         if (objectToUnlock != null)
-            objectToUnlock.SetActive(false); // O reproducir animación
+            objectToUnlock.SetActive(false);
     }
 }
