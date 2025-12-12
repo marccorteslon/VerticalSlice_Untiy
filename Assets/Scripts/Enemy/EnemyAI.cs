@@ -15,18 +15,19 @@ public class EnemyAI : MonoBehaviour
     public Transform player;
 
     private NavMeshAgent agent;
+    private Movement playerMovement;   // para comprobar si está escondido
 
     [Header("Chase Settings")]
     public float chaseSpeed = 6f;
-    public float loseSightTime = 3f;    // Tiempo que tarda en olvidarte
+    public float loseSightTime = 3f;
     private float timeSinceLastSeen = Mathf.Infinity;
 
     [Header("Vision Settings")]
     public float visionDistance = 15f;
     [Range(0, 360)]
     public float visionAngle = 90f;
-    public float eyeHeight = 1.7f;      // altura del "ojo" respecto a transform.position
-    public LayerMask visionBlockingMask = ~0; // capas que bloquean la visión (default: todo)
+    public float eyeHeight = 1.7f;
+    public LayerMask visionBlockingMask = ~0;
 
     [Header("Patrol Settings")]
     public float patrolRadius = 15f;
@@ -43,7 +44,7 @@ public class EnemyAI : MonoBehaviour
     public float maxNoiseSpeed = 6f;
 
     [Header("Rotation Settings")]
-    public float manualTurnSpeed = 720f; // grados por segundo cuando miramos hacia objetivo
+    public float manualTurnSpeed = 720f;
 
     private Transform noiseTarget;
     private bool chasing = false;
@@ -51,7 +52,6 @@ public class EnemyAI : MonoBehaviour
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        // Ajustes por defecto recomendados
         if (agent == null)
         {
             Debug.LogError("EnemyAI: Falta NavMeshAgent");
@@ -59,8 +59,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        // Permitir que NavMeshAgent maneje la rotación por defecto.
-        agent.updateRotation = false; // controlar rotación manualmente para evitar error de rotacion
+        agent.updateRotation = false;
     }
 
     void Start()
@@ -71,38 +70,55 @@ public class EnemyAI : MonoBehaviour
             if (p != null) player = p.transform;
         }
 
+        //obtener referencia a Movement del jugador
+        if (player != null)
+            playerMovement = player.GetComponent<Movement>();
+
         patrolTimer = patrolWaitTime;
         patrolSpeed = agent.speed;
         SetRandomPatrolTarget();
 
-        // Valores seguros por defecto
         agent.stoppingDistance = Mathf.Max(agent.stoppingDistance, 0.5f);
-        agent.angularSpeed = 120f; // se usa por seguridad, pero controlamos rotación manualmente
+        agent.angularSpeed = 120f;
     }
 
     void Update()
     {
+
+        // si el jugador está escondido, el enemigo lo ignora por completo
+
+        if (playerMovement != null && playerMovement.isHidden)
+        {
+            chasing = false;
+            noiseTarget = null;
+            timeSinceLastSeen = Mathf.Infinity;
+
+            agent.speed = patrolSpeed;
+
+            if (!agent.hasPath || agent.remainingDistance <= agent.stoppingDistance + 0.1f)
+                SetRandomPatrolTarget();
+
+            if (agent.hasPath)
+                RotateTowards(agent.steeringTarget);
+
+            return; // ignorar todo lo demás
+        }
+
         // Prioriza seguir ruido
         if (noiseTarget != null)
         {
             FollowNoise();
-            RotateTowards(agent.steeringTarget); // girar suavemente hacia destino del agent
+            RotateTowards(agent.steeringTarget);
             return;
         }
 
         bool seesPlayer = CanSeePlayer();
 
-        // Actualizar temporizador de memoria
         if (seesPlayer)
-        {
             timeSinceLastSeen = 0f;
-        }
         else
-        {
             timeSinceLastSeen += Time.deltaTime;
-        }
 
-        // Si lo veo o lo he visto hace poco tiempo, persigo
         if (timeSinceLastSeen < loseSightTime)
         {
             chasing = true;
@@ -114,11 +130,8 @@ public class EnemyAI : MonoBehaviour
             Patrol();
         }
 
-        // Rotación manual para evitar patinaje: si el agent tiene destino, girar hacia su steering target
         if (agent.hasPath && agent.remainingDistance > agent.stoppingDistance)
-        {
             RotateTowards(agent.steeringTarget);
-        }
     }
 
     void ChasePlayer()
@@ -133,10 +146,8 @@ public class EnemyAI : MonoBehaviour
     {
         agent.speed = patrolSpeed;
 
-        // Si no tiene camino o ha llegado al objetivo, gestionar espera y elegir nuevo objetivo
         if (!agent.hasPath || agent.pathPending)
         {
-            // esperar hasta que se calcule path
             return;
         }
 
@@ -167,23 +178,24 @@ public class EnemyAI : MonoBehaviour
     {
         if (player == null) return false;
 
+        // Si está escondido, nunca puede verlo
+
+        if (playerMovement != null && playerMovement.isHidden)
+            return false;
+
         Vector3 eyePos = transform.position + Vector3.up * eyeHeight;
         Vector3 playerCenter = player.position + Vector3.up * 1f;
         Vector3 dir = playerCenter - eyePos;
         float distance = dir.magnitude;
 
-        // 1. Comprobar distancia
         if (distance > visionDistance) return false;
 
-        // 2. Comprobar ángulo de visión
         float angle = Vector3.Angle(transform.forward, dir);
         if (angle > visionAngle * 0.5f) return false;
 
-        // 3. Raycast directo al jugador (considera solo capas que no bloquean la visión)
         RaycastHit hit;
         if (Physics.Raycast(eyePos, dir.normalized, out hit, visionDistance, visionBlockingMask))
         {
-            // Si el primer hit no es el jugador, no lo ve
             if (hit.transform == player || hit.transform.IsChildOf(player))
             {
                 return true;
@@ -194,13 +206,11 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        // Si no golpea nada (raro), consideramos que no ve
         return false;
     }
 
     void FollowNoise()
     {
-        // velocidad variable al perseguir ruido
         agent.speed = Random.Range(minNoiseSpeed, maxNoiseSpeed);
         if (noiseTarget == null)
         {
@@ -213,7 +223,6 @@ public class EnemyAI : MonoBehaviour
 
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
         {
-            // llegado al ruido, limpiar objetivo
             noiseTarget = null;
             agent.speed = patrolSpeed;
         }
@@ -245,7 +254,6 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Rotación manual suave hacia un objetivo (usa steeringTarget del NavMeshAgent)
     void RotateTowards(Vector3 worldTarget)
     {
         Vector3 dir = (worldTarget - transform.position);
@@ -256,7 +264,6 @@ public class EnemyAI : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, manualTurnSpeed * Time.deltaTime);
     }
 
-    // Overload para pasar transform o steering target
     void RotateTowards(Transform t)
     {
         if (t == null) return;
