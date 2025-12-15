@@ -16,15 +16,29 @@ public class MonsterScript : MonoBehaviour
     [Header("Prefab a spawnear")]
     public GameObject spawnPrefab;
 
+    [Header("Tiempo para cerrar entradas")]
+    public float timeToClose = 5f;
+
+    [Header("Grupos de decorativos")]
+    public InteractableGroup group1;
+    public InteractableGroup group2;
+    public InteractableGroup group3;
+    public InteractableGroup group4;
+
     private InteractableObject currentActive;
     private bool waitingForPlayer = false;
     private float countdown = 0f;
-    public float timeToClose = 0f;
 
     private bool monsterEntered = false;
 
     void Start()
     {
+        // Inicialmente desactivamos todos los grupos
+        group1?.DeactivateGroup();
+        group2?.DeactivateGroup();
+        group3?.DeactivateGroup();
+        group4?.DeactivateGroup();
+
         StartCoroutine(GameLoop());
     }
 
@@ -42,6 +56,9 @@ public class MonsterScript : MonoBehaviour
             currentActive = objects[Random.Range(0, objects.Length)];
             currentActive.Activate();
 
+            // ACTIVAR DECORATIVOS DEL GRUPO CORRESPONDIENTE
+            ActivateGroupForObject(currentActive);
+
             activeObjectText.text = "Entrance to close: " + currentActive.name;
 
             countdown = timeToClose;
@@ -56,6 +73,9 @@ public class MonsterScript : MonoBehaviour
                 timerText.text = "Time: " + countdown.ToString("F1");
                 yield return null;
             }
+
+            // DESACTIVAR DECORATIVOS DEL GRUPO
+            DeactivateGroupForObject(currentActive);
 
             timerText.text = "";
 
@@ -85,14 +105,45 @@ public class MonsterScript : MonoBehaviour
         waitingForPlayer = false;
         activeObjectText.text = "Entrance closed: " + currentActive.name;
 
-        // PARAR AUDIO SI CIERRAS LA ENTRADA
+        // PARAR AUDIO SI EL JUGADOR CIERRA LA ENTRADA
         currentActive.StopAudio();
     }
 
-    IEnumerator ClearMonsterTextAfterDelay()
+    private void ActivateGroupForObject(InteractableObject obj)
     {
-        yield return new WaitForSeconds(2f);
-        monsterText.text = "";
+        switch (obj.groupIndex)
+        {
+            case 1:
+                group1?.ActivateGroup();
+                break;
+            case 2:
+                group2?.ActivateGroup();
+                break;
+            case 3:
+                group3?.ActivateGroup();
+                break;
+            case 4:
+                group4?.ActivateGroup();
+                break;
+        }
     }
 
+    private void DeactivateGroupForObject(InteractableObject obj)
+    {
+        switch (obj.groupIndex)
+        {
+            case 1:
+                group1?.DeactivateGroup();
+                break;
+            case 2:
+                group2?.DeactivateGroup();
+                break;
+            case 3:
+                group3?.DeactivateGroup();
+                break;
+            case 4:
+                group4?.DeactivateGroup();
+                break;
+        }
+    }
 }

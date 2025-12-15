@@ -5,6 +5,10 @@ public class InteractableObject : MonoBehaviour
     [Header("Interacción")]
     public float interactionRadius = 3f;
 
+    [Header("Grupo")]
+    [Range(1, 4)]
+    public int groupIndex = 1; // 1, 2, 3 o 4
+
     private bool isActive = false;
     private MonsterScript gm;
 
@@ -15,8 +19,6 @@ public class InteractableObject : MonoBehaviour
     {
         gm = FindObjectOfType<MonsterScript>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        // Obtiene el AudioSource del objeto
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -35,7 +37,6 @@ public class InteractableObject : MonoBehaviour
     public void PlayAudioLoop()
     {
         if (audioSource == null) return;
-
         audioSource.loop = true;
         audioSource.Play();
     }
@@ -43,7 +44,6 @@ public class InteractableObject : MonoBehaviour
     public void StopAudio()
     {
         if (audioSource == null) return;
-
         audioSource.Stop();
     }
 
