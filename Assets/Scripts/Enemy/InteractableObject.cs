@@ -7,14 +7,16 @@ public class InteractableObject : MonoBehaviour
 
     [Header("Grupo")]
     [Range(1, 4)]
-    public int groupIndex = 1; // 1, 2, 3 o 4
+    public int groupIndex = 1;
 
     [Header("Visual")]
-    public GameObject visualObject; // Nuevo objeto que se hará visible
+    public GameObject visualObject;
+
+    [Header("Animación")]
+    public Animator animator;
 
     private bool isActive = false;
     private MonsterScript gm;
-
     private Transform player;
     private AudioSource audioSource;
 
@@ -24,7 +26,6 @@ public class InteractableObject : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         audioSource = GetComponent<AudioSource>();
 
-        // Asegurarse de que el objeto visual esté inicialmente desactivado
         if (visualObject != null)
             visualObject.SetActive(false);
     }
@@ -35,7 +36,11 @@ public class InteractableObject : MonoBehaviour
         Debug.Log(name + " ACTIVADO");
 
         if (visualObject != null)
-            visualObject.SetActive(true); // Activamos el objeto visual
+            visualObject.SetActive(true);
+
+        // TRIGGER: el monstruo intenta entrar
+        if (animator != null)
+            animator.SetTrigger("Abrir");
     }
 
     public void Deactivate()
@@ -43,8 +48,12 @@ public class InteractableObject : MonoBehaviour
         isActive = false;
         Debug.Log(name + " DESACTIVADO");
 
+        // TRIGGER: el jugador cierra la ventana
+        if (animator != null)
+            animator.SetTrigger("Cerrar");
+
         if (visualObject != null)
-            visualObject.SetActive(false); // Desactivamos el objeto visual
+            visualObject.SetActive(false);
     }
 
     public void PlayAudioLoop()
