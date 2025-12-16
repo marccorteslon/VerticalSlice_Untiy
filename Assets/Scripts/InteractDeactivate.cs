@@ -1,44 +1,58 @@
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class InteractDeactivate : MonoBehaviour
 {
     [Header("Objeto a desactivar")]
     public GameObject objectToDeactivate;
 
     [Header("Configuración")]
-    public KeyCode interactKey = KeyCode.E; // Tecla de interacción
-    public float interactionDistance = 3f;   // Distancia máxima para interactuar
+    public KeyCode interactKey = KeyCode.E;
+    public float interactionDistance = 3f;
+
+    [Header("Audio")]
+    public AudioClip loopSound;
 
     private Transform player;
+    private AudioSource audioSource;
+    private bool hasInteracted = false;
 
     void Start()
     {
-        // Suponiendo que el jugador tiene el tag "Player"
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = loopSound;
+        audioSource.loop = true;
+        audioSource.playOnAwake = false;
 
         if (objectToDeactivate == null)
-        {
             Debug.LogWarning("No has asignado un objeto para desactivar.");
-        }
+
+        if (loopSound == null)
+            Debug.LogWarning("No has asignado un sonido en bucle.");
     }
 
     void Update()
     {
-        if (player == null || objectToDeactivate == null)
+        if (hasInteracted || player == null || objectToDeactivate == null)
             return;
 
-        // Calcula la distancia al jugador
         float distance = Vector3.Distance(player.position, transform.position);
 
-        // Si el jugador está cerca y pulsa la tecla
         if (distance <= interactionDistance && Input.GetKeyDown(interactKey))
         {
             objectToDeactivate.SetActive(false);
-            Debug.Log(objectToDeactivate.name + " ha sido desactivado.");
+
+            if (loopSound != null)
+                audioSource.Play();
+
+            hasInteracted = true;
+
+            Debug.Log(objectToDeactivate.name + " ha sido desactivado y el sonido ha comenzado.");
         }
     }
 
-    // Opcional: dibuja la distancia de interacción en la escena
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

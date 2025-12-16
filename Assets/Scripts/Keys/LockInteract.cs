@@ -21,12 +21,17 @@ public class LockInteract : MonoBehaviour
     public float noiseInterval = 0.5f;
     private float noiseTimer = 0f;
 
-    private Transform player;
+    [Header("Jugador")]
+    public Transform player; // Ahora se asigna desde el Inspector
+
     private bool isInteracting = false;
 
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        if (player == null)
+        {
+            Debug.LogError("Player no asignado en LockInteract!");
+        }
 
         if (progressBar != null)
         {
@@ -41,6 +46,8 @@ public class LockInteract : MonoBehaviour
 
     private void Update()
     {
+        if (player == null) return; // Seguridad
+
         float distance = Vector3.Distance(player.position, transform.position);
 
         if (distance <= interactDistance && !targetLock.isOpen)
@@ -105,16 +112,21 @@ public class LockInteract : MonoBehaviour
     {
         PlayerInventory inv = player.GetComponent<PlayerInventory>();
 
-        StopInteraction();
+        if (inv == null)
+        {
+            Debug.LogError("PlayerInventory no encontrado en el jugador.");
+            return;
+        }
 
+        StopInteraction();
         currentProgress = 0f;
 
-        progressBar.value = 0f;
+        if (progressBar != null)
+            progressBar.value = 0f;
 
         if (progressPanel != null)
             progressPanel.SetActive(false);
 
-        // Llamar al sistema de llaves original
         targetLock.TryUnlock(inv);
     }
 

@@ -1,32 +1,80 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerDeath : MonoBehaviour
 {
     [Header("UI")]
-    public GameObject deathPanel;     // Panel que contiene el texto "Has muerto"
+    public GameObject deathPanel;
+    public GameObject victoryPanel;    // Nueva pantalla de victoria
 
-    private void Start()
+    [Header("Audio")]
+    public AudioSource audioSource;    // AudioSource del jugador o global
+    public AudioClip deathSound;       // Sonido de muerte
+    public AudioClip victorySound;     // Sonido de victoria
+
+    private bool isDead = false;
+    private bool hasWon = false;
+
+    void Start()
     {
-        // Oculta el panel al inicio
         if (deathPanel != null)
             deathPanel.SetActive(false);
+
+        if (victoryPanel != null)
+            victoryPanel.SetActive(false);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // Si el objeto que colisiona tiene el tag Enemy
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (!isDead && hit.gameObject.CompareTag("Enemy"))
         {
             Die();
+        }
+
+        if (!hasWon && hit.gameObject.CompareTag("Victory"))
+        {
+            Win();
         }
     }
 
     void Die()
     {
+        isDead = true;
+
+        // Reproduce el sonido de muerte
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+
         if (deathPanel != null)
             deathPanel.SetActive(true);
 
-        Time.timeScale = 0f; // Congela el juego
+        // Pausa el juego
+        Time.timeScale = 0f;
+
+        // Libera el ratón para el menú de muerte
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    void Win()
+    {
+        hasWon = true;
+
+        // Reproduce el sonido de victoria
+        if (audioSource != null && victorySound != null)
+        {
+            audioSource.PlayOneShot(victorySound);
+        }
+
+        if (victoryPanel != null)
+            victoryPanel.SetActive(true);
+
+        // Pausa el juego
+        Time.timeScale = 0f;
+
+        // Libera el ratón para el menú de victoria
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

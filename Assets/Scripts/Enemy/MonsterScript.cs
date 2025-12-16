@@ -89,6 +89,7 @@ public class MonsterScript : MonoBehaviour
                 currentActive.Deactivate();
 
                 monsterText.text = "THE MONSTER HAS ENTERED!";
+                StartCoroutine(ClearMonsterTextAfterDelay(2f)); // Limpiar el texto tras 2 segundos
                 activeObjectText.text = "";
                 timerText.text = "";
 
@@ -145,5 +146,12 @@ public class MonsterScript : MonoBehaviour
                 group4?.DeactivateGroup();
                 break;
         }
+    }
+
+    // Corutina para limpiar el texto del monstruo después de un delay
+    private IEnumerator ClearMonsterTextAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        monsterText.text = "";
     }
 }
