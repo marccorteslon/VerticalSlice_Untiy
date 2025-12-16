@@ -9,6 +9,9 @@ public class InteractableObject : MonoBehaviour
     [Range(1, 4)]
     public int groupIndex = 1; // 1, 2, 3 o 4
 
+    [Header("Visual")]
+    public GameObject visualObject; // Nuevo objeto que se hará visible
+
     private bool isActive = false;
     private MonsterScript gm;
 
@@ -20,18 +23,28 @@ public class InteractableObject : MonoBehaviour
         gm = FindObjectOfType<MonsterScript>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         audioSource = GetComponent<AudioSource>();
+
+        // Asegurarse de que el objeto visual esté inicialmente desactivado
+        if (visualObject != null)
+            visualObject.SetActive(false);
     }
 
     public void Activate()
     {
         isActive = true;
         Debug.Log(name + " ACTIVADO");
+
+        if (visualObject != null)
+            visualObject.SetActive(true); // Activamos el objeto visual
     }
 
     public void Deactivate()
     {
         isActive = false;
         Debug.Log(name + " DESACTIVADO");
+
+        if (visualObject != null)
+            visualObject.SetActive(false); // Desactivamos el objeto visual
     }
 
     public void PlayAudioLoop()

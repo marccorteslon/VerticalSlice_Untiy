@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class TogglePanel : MonoBehaviour
 {
-    [Header("Panel a mostrar u ocultar")]
+    [Header("Panel principal")]
     public GameObject panel;
+
+    [Header("Paneles a cerrar al abrir")]
+    public GameObject[] panelsToClose;
 
     public void Toggle()
     {
@@ -13,13 +16,19 @@ public class TogglePanel : MonoBehaviour
             return;
         }
 
-        bool isActive = panel.activeSelf;
-        panel.SetActive(!isActive);
+        bool willOpen = !panel.activeSelf;
+
+        if (willOpen)
+            CloseOtherPanels();
+
+        panel.SetActive(willOpen);
     }
 
     public void Open()
     {
         if (panel == null) return;
+
+        CloseOtherPanels();
         panel.SetActive(true);
     }
 
@@ -27,5 +36,16 @@ public class TogglePanel : MonoBehaviour
     {
         if (panel == null) return;
         panel.SetActive(false);
+    }
+
+    private void CloseOtherPanels()
+    {
+        if (panelsToClose == null) return;
+
+        foreach (GameObject p in panelsToClose)
+        {
+            if (p != null && p != panel)
+                p.SetActive(false);
+        }
     }
 }
