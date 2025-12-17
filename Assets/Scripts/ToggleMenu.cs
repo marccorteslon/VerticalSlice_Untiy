@@ -3,14 +3,25 @@ using UnityEngine;
 public class ToggleMenu : MonoBehaviour
 {
     [Header("UI")]
-    public GameObject panel;
+    public GameObject mainPanel;              // Panel principal del menú
+    public GameObject[] otherPanelsToClose;   // Otros paneles que se deben cerrar al cerrar el menú
 
     private bool isPaused = false;
 
     void Start()
     {
-        if (panel != null)
-            panel.SetActive(false);
+        // Aseguramos que todos los paneles estén ocultos al inicio
+        if (mainPanel != null)
+            mainPanel.SetActive(false);
+
+        if (otherPanelsToClose != null)
+        {
+            foreach (var panel in otherPanelsToClose)
+            {
+                if (panel != null)
+                    panel.SetActive(false);
+            }
+        }
     }
 
     void Update()
@@ -24,22 +35,34 @@ public class ToggleMenu : MonoBehaviour
     // Método público para botones
     public void TogglePause()
     {
-        if (panel == null) return;
+        if (mainPanel == null) return;
 
         isPaused = !isPaused;
-        panel.SetActive(isPaused);
+        mainPanel.SetActive(isPaused);
 
         if (isPaused)
         {
-            Time.timeScale = 0f;                   // Pausa el juego
-            Cursor.lockState = CursorLockMode.None; // Desbloquea el cursor
-            Cursor.visible = true;                 // Hace visible el cursor
+            // Pausar juego y mostrar cursor
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         else
         {
-            Time.timeScale = 1f;                   // Reanuda el juego
-            Cursor.lockState = CursorLockMode.Locked; // Bloquea el cursor
-            Cursor.visible = false;                // Oculta el cursor
+            // Reanudar juego y ocultar cursor
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            // Cerrar otros paneles si están abiertos
+            if (otherPanelsToClose != null)
+            {
+                foreach (var panel in otherPanelsToClose)
+                {
+                    if (panel != null)
+                        panel.SetActive(false);
+                }
+            }
         }
     }
 

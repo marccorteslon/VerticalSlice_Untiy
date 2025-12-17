@@ -62,7 +62,9 @@ public class MonsterScript : MonoBehaviour
             // ACTIVAR DECORATIVOS DEL GRUPO CORRESPONDIENTE
             ActivateGroupForObject(currentActive);
 
-            activeObjectText.text = "Entrance to close: " + currentActive.name;
+            //activeObjectText.text = "Entrance to close: " + currentActive.name;
+
+            activeObjectText.text = "Close the window!";
 
             countdown = timeToClose;
             waitingForPlayer = true;
@@ -91,8 +93,8 @@ public class MonsterScript : MonoBehaviour
                 monsterEntered = true;
                 currentActive.Deactivate();
 
-                monsterText.text = "THE MONSTER HAS ENTERED!";
-                StartCoroutine(ClearMonsterTextAfterDelay(2f)); // Limpiar el texto tras 2 segundos
+                monsterText.text = "YOU'RE NOT ALONE ANYMORE, BE CAREFUL.";
+                StartCoroutine(ClearMonsterTextAfterDelay(4f)); // Limpiar el texto tras 2 segundos
                 activeObjectText.text = "";
                 timerText.text = "";
 

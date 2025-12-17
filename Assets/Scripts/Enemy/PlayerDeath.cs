@@ -4,12 +4,12 @@ public class PlayerDeath : MonoBehaviour
 {
     [Header("UI")]
     public GameObject deathPanel;
-    public GameObject victoryPanel;    // Nueva pantalla de victoria
+    public GameObject victoryPanel;
 
     [Header("Audio")]
-    public AudioSource audioSource;    // AudioSource del jugador o global
-    public AudioClip deathSound;       // Sonido de muerte
-    public AudioClip victorySound;     // Sonido de victoria
+    public AudioSource audioSource;
+    public AudioClip deathSound;
+    public AudioClip victorySound;
 
     private bool isDead = false;
     private bool hasWon = false;
@@ -23,14 +23,14 @@ public class PlayerDeath : MonoBehaviour
             victoryPanel.SetActive(false);
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
+    void OnTriggerEnter(Collider other)
     {
-        if (!isDead && hit.gameObject.CompareTag("Enemy"))
+        if (!isDead && other.CompareTag("Enemy"))
         {
             Die();
         }
 
-        if (!hasWon && hit.gameObject.CompareTag("Victory"))
+        if (!hasWon && other.CompareTag("Victory"))
         {
             Win();
         }
@@ -40,7 +40,6 @@ public class PlayerDeath : MonoBehaviour
     {
         isDead = true;
 
-        // Reproduce el sonido de muerte
         if (audioSource != null && deathSound != null)
         {
             audioSource.PlayOneShot(deathSound);
@@ -49,10 +48,7 @@ public class PlayerDeath : MonoBehaviour
         if (deathPanel != null)
             deathPanel.SetActive(true);
 
-        // Pausa el juego
         Time.timeScale = 0f;
-
-        // Libera el ratón para el menú de muerte
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -61,7 +57,6 @@ public class PlayerDeath : MonoBehaviour
     {
         hasWon = true;
 
-        // Reproduce el sonido de victoria
         if (audioSource != null && victorySound != null)
         {
             audioSource.PlayOneShot(victorySound);
@@ -70,10 +65,7 @@ public class PlayerDeath : MonoBehaviour
         if (victoryPanel != null)
             victoryPanel.SetActive(true);
 
-        // Pausa el juego
         Time.timeScale = 0f;
-
-        // Libera el ratón para el menú de victoria
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }

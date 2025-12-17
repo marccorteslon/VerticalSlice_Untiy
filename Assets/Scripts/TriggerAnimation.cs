@@ -8,6 +8,11 @@ public class TriggerAnimation : MonoBehaviour
     [Header("Nombre del Trigger")]
     public string triggerName = "Activate";
 
+    [Header("Audio")]
+    public AudioSource audioSource; // AudioSource que reproducirá el sonido
+    public AudioClip clip;          // Clip de sonido a reproducir
+    public float delay = 0.5f;      // Retraso antes de reproducir el sonido
+
     private bool activated = false;
 
     private void OnTriggerEnter(Collider other)
@@ -18,6 +23,15 @@ public class TriggerAnimation : MonoBehaviour
         {
             animator.SetTrigger(triggerName);
             activated = true;
+
+            // Reproducir el sonido con retraso
+            if (audioSource != null && clip != null)
+                Invoke(nameof(PlaySound), delay);
         }
+    }
+
+    private void PlaySound()
+    {
+        audioSource.PlayOneShot(clip);
     }
 }
