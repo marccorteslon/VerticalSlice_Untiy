@@ -19,6 +19,9 @@ public class MonsterScript : MonoBehaviour
     [Header("Tiempo para cerrar entradas")]
     public float timeToClose = 5f;
 
+    public float minWaitTime = 5f;
+    public float maxWaitTime = 20f;
+
     [Header("Grupos de decorativos")]
     public InteractableGroup group1;
     public InteractableGroup group2;
@@ -50,7 +53,7 @@ public class MonsterScript : MonoBehaviour
             activeObjectText.text = "The monster is searching for an entrance...";
             timerText.text = "";
 
-            float waitTime = Random.Range(5f, 20f);
+            float waitTime = Random.Range(minWaitTime, maxWaitTime);
             yield return new WaitForSeconds(waitTime);
 
             currentActive = objects[Random.Range(0, objects.Length)];

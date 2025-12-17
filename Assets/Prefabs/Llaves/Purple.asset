@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7bd9862835b8fa49aed4731f7d86601, type: 3}
   m_Name: Purple
   m_EditorClassIdentifier: 
-  keyID: Yellow
+  keyID: Purple
