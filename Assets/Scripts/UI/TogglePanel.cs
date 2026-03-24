@@ -8,6 +8,18 @@ public class TogglePanel : MonoBehaviour
     [Header("Paneles a cerrar al abrir")]
     public GameObject[] panelsToClose;
 
+    [Header("Control por teclado (opcional)")]
+    public bool useKey = false;          // Activar/desactivar uso de tecla
+    public KeyCode toggleKey = KeyCode.Escape; // Tecla asignable
+
+    void Update()
+    {
+        if (useKey && Input.GetKeyDown(toggleKey))
+        {
+            Toggle();
+        }
+    }
+
     public void Toggle()
     {
         if (panel == null)

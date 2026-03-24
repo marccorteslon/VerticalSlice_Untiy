@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class InteractableObject : MonoBehaviour
     [Header("Animación")]
     public Animator animator;
 
+    [Header("UI")]
+    public TextMeshProUGUI interactText;
+
     private bool isActive = false;
     private MonsterScript gm;
     private Transform player;
@@ -28,6 +32,16 @@ public class InteractableObject : MonoBehaviour
 
         if (visualObject != null)
             visualObject.SetActive(false);
+
+        if (interactText != null)
+        {
+            interactText.text = "Press <color=yellow>E</color> to Close";
+            interactText.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning(name + ": interactText no está asignado en el Inspector.");
+        }
     }
 
     public void Activate()
@@ -38,7 +52,6 @@ public class InteractableObject : MonoBehaviour
         if (visualObject != null)
             visualObject.SetActive(true);
 
-        // TRIGGER: el monstruo intenta entrar
         if (animator != null)
             animator.SetTrigger("Abrir");
     }
@@ -48,12 +61,13 @@ public class InteractableObject : MonoBehaviour
         isActive = false;
         Debug.Log(name + " DESACTIVADO");
 
-        // TRIGGER: el jugador cierra la ventana
         if (animator != null)
             animator.SetTrigger("Cerrar");
 
         if (visualObject != null)
             visualObject.SetActive(false);
+
+        HideInteractText();
     }
 
     public void PlayAudioLoop()
@@ -71,15 +85,50 @@ public class InteractableObject : MonoBehaviour
 
     void Update()
     {
-        if (!isActive) return;
+        if (player == null) return;
+
+        if (!isActive)
+        {
+            HideInteractText();
+            return;
+        }
 
         float dist = Vector3.Distance(player.position, transform.position);
+        bool canInteract = dist <= interactionRadius;
 
-        if (dist <= interactionRadius && Input.GetKeyDown(KeyCode.E))
+        Debug.Log(name + " | isActive: " + isActive + " | dist: " + dist + " | canInteract: " + canInteract);
+
+        if (canInteract)
         {
-            Deactivate();
-            gm.NotifyObjectDeactivated();
+            ShowInteractText();
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Deactivate();
+
+                if (gm != null)
+                    gm.NotifyObjectDeactivated();
+            }
         }
+        else
+        {
+            HideInteractText();
+        }
+    }
+
+    void ShowInteractText()
+    {
+        if (interactText == null) return;
+
+        interactText.text = "Press <color=yellow>E</color> to Close";
+        interactText.gameObject.SetActive(true);
+    }
+
+    void HideInteractText()
+    {
+        if (interactText == null) return;
+
+        interactText.gameObject.SetActive(false);
     }
 
     void OnDrawGizmosSelected()
