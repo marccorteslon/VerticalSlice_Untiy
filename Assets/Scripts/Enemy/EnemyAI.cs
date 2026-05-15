@@ -17,6 +17,11 @@ public class EnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private Movement playerMovement;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip patrolSound;
+    public AudioClip chaseSound;
+
     [Header("Chase Settings")]
     public float chaseSpeed = 6f;
     public float loseSightTime = 3f;
@@ -48,6 +53,7 @@ public class EnemyAI : MonoBehaviour
 
     private Transform noiseTarget;
     private bool chasing = false;
+    private bool movementSoundsStopped = false;
 
     void Awake()
     {
@@ -73,10 +79,22 @@ public class EnemyAI : MonoBehaviour
         agent.angularSpeed = 120f;
 
         SetRandomPatrolTarget();
+
+        // Configuración 3D del audio
+        if (audioSource != null)
+        {
+            audioSource.loop = true;
+            audioSource.spatialBlend = 1f; // 3D
+            audioSource.minDistance = 2f;
+            audioSource.maxDistance = 20f;
+        }
     }
 
     void Update()
     {
+        if (movementSoundsStopped)
+            return;
+
         // Jugador escondido = ignorar todo y patrullar
         if (playerMovement != null && playerMovement.isHidden)
         {
@@ -128,6 +146,8 @@ public class EnemyAI : MonoBehaviour
         {
             agent.speed = chaseSpeed;
             agent.SetDestination(player.position);
+
+            PlayChaseSound();
         }
         else
         {
@@ -137,6 +157,8 @@ public class EnemyAI : MonoBehaviour
 
     void Patrol()
     {
+        PlayPatrolSound();
+
         agent.speed = patrolSpeed;
 
         if (!agent.hasPath)
@@ -178,6 +200,53 @@ public class EnemyAI : MonoBehaviour
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
         {
             ForcePatrol();
+        }
+    }
+
+    public void StopMovementSounds()
+    {
+        movementSoundsStopped = true;
+
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
+
+        // Paramos el AudioSource asignado y cualquier AudioSource que este en el enemigo
+        // o en sus hijos, por si el sonido de patrol/chase esta en otro objeto del prefab.
+        AudioSource[] sources = GetComponentsInChildren<AudioSource>(true);
+
+        foreach (AudioSource source in sources)
+        {
+            source.Stop();
+
+            if (source == audioSource || source.clip == patrolSound || source.clip == chaseSound)
+                source.clip = null;
+        }
+    }
+
+    void PlayPatrolSound()
+    {
+        if (audioSource == null || patrolSound == null) return;
+
+        if (audioSource.clip != patrolSound)
+        {
+            audioSource.Stop();
+            audioSource.clip = patrolSound;
+            audioSource.Play();
+        }
+    }
+
+    void PlayChaseSound()
+    {
+        if (audioSource == null || chaseSound == null) return;
+
+        if (audioSource.clip != chaseSound)
+        {
+            audioSource.Stop();
+            audioSource.clip = chaseSound;
+            audioSource.Play();
         }
     }
 
