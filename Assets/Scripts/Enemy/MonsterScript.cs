@@ -91,6 +91,9 @@ public class MonsterScript : MonoBehaviour
             {
                 // EL MONSTRUO ENTRA
                 monsterEntered = true;
+
+                currentActive.PlayMonsterEnterSound();
+
                 currentActive.Deactivate();
 
                 monsterText.text = "YOU'RE NOT ALONE ANYMORE, BE CAREFUL.";

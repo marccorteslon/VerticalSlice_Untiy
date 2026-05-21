@@ -16,6 +16,10 @@ public class InteractableObject : MonoBehaviour
     [Header("Animación")]
     public Animator animator;
 
+    [Header("Audio")]
+    public AudioSource enterAudioSource;
+    public AudioClip enterSound;
+
     [Header("UI")]
     public TextMeshProUGUI interactText;
 
@@ -135,5 +139,13 @@ public class InteractableObject : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionRadius);
+    }
+
+    public void PlayMonsterEnterSound()
+    {
+        if (enterAudioSource != null && enterSound != null)
+        {
+            enterAudioSource.PlayOneShot(enterSound);
+        }
     }
 }
