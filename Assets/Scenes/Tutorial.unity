@@ -31060,6 +31060,7 @@ GameObject:
   - component: {fileID: 1747898607}
   - component: {fileID: 1747898610}
   - component: {fileID: 1747898609}
+  - component: {fileID: 1747898611}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -31135,6 +31136,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747898606}
   m_Mesh: {fileID: -5546940888850326318, guid: c1da3fe673f70c3458992a3fdd0b51b4, type: 3}
+--- !u!114 &1747898611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747898606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a6a62687fe315e43aa8c71a47aaf6e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0.9528302, g: 0.7524088, b: 0.13932894, a: 1}
+  minIntensity: 0
+  maxIntensity: 0.5
+  pulseSpeed: 4
 --- !u!1 &1756612847
 GameObject:
   m_ObjectHideFlags: 0
